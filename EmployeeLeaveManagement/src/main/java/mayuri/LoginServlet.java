@@ -9,39 +9,33 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-/**
- * Servlet implementation class LoginServlet
- */
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+    private static final long serialVersionUID = 1L;
+
     public LoginServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-	{
-		String code = request.getParameter("officeUserCode");
-        String pass = request.getParameter("officeUserPass");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String officeUserCode = request.getParameter("officeUserCode");
+        String officeUserPass = request.getParameter("officeUserPass");
 
         HttpSession session = request.getSession();
 
-        // Temporary login check
-        if ("admin".equals(code) && "123".equals(pass)) {
-            response.sendRedirect("dashboard.jsp");
+        // 🔥 TEMP LOGIC (later we connect DB like LoginModel)
+        if ("admin".equals(officeUserCode) && "123".equals(officeUserPass)) {
+
+            // ✅ SUCCESS → redirect to LeaveApplication.jsp
+            response.sendRedirect("view/LeaveApplication.jsp");
+
         } else {
+
+            // ❌ FAILED LOGIN
             session.setAttribute("LoginError", 1);
             response.sendRedirect("index.jsp");
         }
-        
-	}
-
+    }
 }
