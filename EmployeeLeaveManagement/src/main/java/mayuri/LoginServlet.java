@@ -18,18 +18,16 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         // TEMP LOGIN
-        if ("admin".equals(officeUserCode) && "123".equals(officeUserPass)) {
-
-            // ✅ STORE USER IN SESSION (IMPORTANT)
-            session.setAttribute("officeUserName", officeUserCode);
-
-            // REDIRECT
-            response.sendRedirect("view/LeaveApplication.jsp");
-
-        } else {
-
-            session.setAttribute("LoginError", 1);
-            response.sendRedirect("index.jsp");
+        LoginModel model = new LoginModel();
+        
+        if(model.checkLogin(officeUserCode, officeUserPass))
+        {
+        	response.sendRedirect("view/LeaveApplication.jsp");
+        }
+        else
+        {
+        	session.setAttribute("LoginError", 1);
+        	response.sendRedirect("index.jsp");
         }
     }
 }
