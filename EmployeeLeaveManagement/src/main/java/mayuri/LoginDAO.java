@@ -4,36 +4,73 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class LoginDAO {
+import jakarta.servlet.http.HttpSession;
 
-    public boolean validateUser(String code, String pass) {
-        boolean isFound = false;
-
-        try {
-            Connection con = DBConnection.getConnection();
-
-            String query = "SELECT * FROM employeeinfo WHERE eEmployeeCodeNumber=? AND ePassword=? AND eEmployeeVerification=1";
-
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, code);
-            ps.setString(2, pass);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                isFound = true;
-
-                // Update last login
-                String updateQuery = "UPDATE employeeinfo SET eLastLogin = NOW() WHERE eEmployeeCodeNumber=?";
-                PreparedStatement ps2 = con.prepareStatement(updateQuery);
-                ps2.setString(1, code);
-                ps2.executeUpdate();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return isFound;
-    }
+public class LoginDAO 
+{
+	public String validateUser(String code, String pass, HttpSession session)
+	{
+		String role = null;
+		
+		String query = "SELECT eEmployeeName, eRole FROM employeeinfo " +
+		              "WHERE eEmployeeCodeNumber=? AND ePassword=? AND eEmployeeVerification=1";
+		
+		try (Connection con = DBConnection.getConnection();
+			 PreparedStatement ps = con.prepareStatement(query)) 
+		{
+			ps.setString(1, code);
+			ps.setString(2, pass);
+			
+			try(ResultSet rs = ps.executeQuery())
+			{
+				if (rs.next()) 
+				{
+					String name = rs.getString("eEmployeeName");
+					role = rs.getString("eRole");
+					
+					session.setAttribute("userCode", code);
+					session.setAttribute("userName", name);
+					session.setAttribute("userRole", role);
+					
+					updateLastLogin(code, con);
+				}
+				
+			}
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			
+		}
+		return role;
+	}
+	private void updateLastLogin(String code, Connection con)
+	{
+		String updateQuery = "UPDATE employeeinfo SET eLastLogin = NOW() WHERE eEmployeeCodeNumber=?";
+		
+		try(PreparedStatement ps = con.prepareStatement(updateQuery))
+		{
+			ps.setString(1, code);
+			ps.execute();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
