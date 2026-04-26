@@ -17,9 +17,10 @@ public class ApprovalServlet extends HttpServlet {
         // 1. Get the data from the URL (e.g., ApprovalServlet?id=5&status=Approved)
         String id = request.getParameter("id");
         String status = request.getParameter("status");
+        System.out.println("Updating ID:  "+ id + " to Status: " +status);
 
         // 2. Update the database directly
-        String sql = "UPDATE leave_requests SET status=? WHERE id=?";
+        String sql = "UPDATE leaverequests SET status=? WHERE id=?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
