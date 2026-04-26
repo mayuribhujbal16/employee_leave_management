@@ -11,9 +11,11 @@ public class LoginDAO
 	public String validateUser(String code, String pass, HttpSession session)
 	{
 		String role = null;
+
+
+		String query = "SELECT eEmployeeName, eEmployeeRole FROM employeeinfo " +
+		               "WHERE eEmployeeCodeNumber=? AND ePassword=? AND eEmployeeVerification=1";
 		
-		String query = "SELECT eEmployeeName, eRole FROM employeeinfo " +
-		              "WHERE eEmployeeCodeNumber=? AND ePassword=? AND eEmployeeVerification=1";
 		
 		try (Connection con = DBConnection.getConnection();
 			 PreparedStatement ps = con.prepareStatement(query)) 
@@ -26,13 +28,13 @@ public class LoginDAO
 				if (rs.next()) 
 				{
 					String name = rs.getString("eEmployeeName");
-					role = rs.getString("eRole");
+					role = rs.getString("eEmployeeRole");
 					
 					session.setAttribute("userCode", code);
 					session.setAttribute("userName", name);
 					session.setAttribute("userRole", role);
 					
-					updateLastLogin(code, con);
+				//	updateLastLogin(code, con);
 				}
 				
 			}
