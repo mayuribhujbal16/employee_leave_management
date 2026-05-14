@@ -9,24 +9,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-/**
- * Servlet implementation class LeaveServlet
- */
+
 @WebServlet("/LeaveServlet")
 public class LeaveServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+    
     public LeaveServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 		// 1. Get form data
@@ -38,16 +29,23 @@ public class LeaveServlet extends HttpServlet {
         // 2. Get employee code from Session
         HttpSession session = request.getSession();
         String empCode = (String) session.getAttribute("userCode");
+        
+        if (empCode == null) {
+            response.sendRedirect("index.jsp");
+            return;
+        }
 
         // 3. Save to Database
         try (Connection con = DBConnection.getConnection()) {
-            String query = "INSERT INTO leaverequests (empCode, leaveType, startDate, endDate, reason) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO leave_requests (employeeCode, leaveType, startDate, endDate, reason, status) VALUES (?, ?, ?, ?, ?, ?)";
+            
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, empCode);
             ps.setString(2, leaveType);
             ps.setString(3, startDate);
             ps.setString(4, endDate);
             ps.setString(5, reason);
+            ps.setString(6, "pending");
             
             ps.executeUpdate();
             
@@ -57,10 +55,18 @@ public class LeaveServlet extends HttpServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/views/LeaveApplication.jsp?msg=success");
+            response.sendRedirect(request.getContextPath() + "/views/LeaveApplication.jsp?msg=error");
         }
         
         
 	}
+	
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException 
+	{
+		response.sendRedirect("views/LeaveApplication.jsp");
+	}
+
 
 }

@@ -68,5 +68,70 @@
     </div>
 </div>
 
+<hr class="mt-5">
+
+<div class="container">
+    <h4 class="text-center">My Leave Requests</h4>
+
+    <table class="table table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+
+<%
+    try {
+        java.sql.Connection con = mayuri.DBConnection.getConnection();
+        String empCode = (String) session.getAttribute("userCode");
+
+        String query = "SELECT * FROM leave_requests WHERE employeeCode=? ORDER BY id DESC";
+        java.sql.PreparedStatement ps = con.prepareStatement(query);
+        ps.setString(1, empCode);
+
+        java.sql.ResultSet rs = ps.executeQuery();
+
+        while(rs.next()) {
+
+            String status = rs.getString("status");
+            String color = "secondary";
+
+            if(status.equalsIgnoreCase("pending")) color = "warning";
+            else if(status.equalsIgnoreCase("approved")) color = "success";
+            else if(status.equalsIgnoreCase("rejected")) color = "danger";
+%>
+
+<tr>
+    <td><%= rs.getString("leaveType") %></td>
+    <td><%= rs.getString("startDate") %></td>
+    <td><%= rs.getString("endDate") %></td>
+    <td><%= rs.getString("reason") %></td>
+   <td>
+    <span class="badge 
+        <%= rs.getString("status").equals("approved") ? "bg-success" : 
+            rs.getString("status").equals("rejected") ? "bg-danger" : 
+            "bg-warning text-dark" %>">
+        <%= rs.getString("status") %>
+    </span>
+</td>
+</tr>
+
+<%
+        }
+    } catch(Exception e) {
+        e.printStackTrace();
+    }
+%>
+
+        </tbody>
+    </table>
+</div>
+
+
 </body>
 </html>

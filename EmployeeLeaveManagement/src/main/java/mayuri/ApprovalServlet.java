@@ -20,7 +20,7 @@ public class ApprovalServlet extends HttpServlet {
         System.out.println("Updating ID:  "+ id + " to Status: " +status);
 
         // 2. Update the database directly
-        String sql = "UPDATE leaverequests SET status=? WHERE id=?";
+        String sql = "UPDATE leave_requests SET status=? WHERE id=?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
